@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lucky Wheel – Live Demo</title>
+<style>
+  :root{
+    --bg1: #111;
+    --bg2: #262626;
+    --card:#1e1e1e;
+    --accent: linear-gradient(45deg,#fff,#aaa);
+    --text:#f0f0f0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:var(--text);
+    padding:2rem;
+  }
+  .container{
+    width:100%;
+    max-width:920px;
+    background:var(--card);
+    border-radius:12px;
+    padding:1.6rem;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+  }
+  h1{text-align:center;margin:0 0 1rem;background:var(--accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .cols{display:flex;gap:1rem;flex-wrap:wrap}
+  .left,.right{flex:1;min-width:280px}
+  .card{background:#232323;padding:1rem;border-radius:10px;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.03)}
+  label{display:block;margin-bottom:0.5rem;color:#cfcfcf}
+  textarea,input{width:100%;padding:0.6rem;border-radius:8px;border:none;background:#2b2b2b;color:#fff;font-size:1rem}
+  .row{display:flex;gap:0.6rem;margin-top:0.6rem}
+  .btn{flex:1;padding:0.7rem;border:none;border-radius:8px;cursor:pointer;background:linear-gradient(90deg,#3a3a3a,#555);color:#fff}
+  .btn:hover{transform:translateY(-2px)}
+  canvas{display:block;margin:0 auto;background:transparent}
+  .result{font-weight:bold;text-align:center;padding:0.6rem;margin-top:0.8rem;color:#dcdcdc}
+  .small{font-size:0.9rem;color:#bdbdbd}
+  @media(max-width:760px){.cols{flex-direction:column}.left,.right{min-width:unset}}
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>Lucky Wheel — Live Demo</h1>
+
+    <div class="cols">
+      <div class="left">
+        <div class="card">
+          <label for="items">Enter items (comma separated)</label>
+          <textarea id="items" rows="4" placeholder="e.g. Apple, Banana, Orange, Prize"></textarea>
+
+          <label class="small" style="margin-top:0.8rem">Optional: set rotation duration (seconds)</label>
+          <input id="duration" type="number" min="2" max="20" value="5" />
+
+          <div class="row" style="margin-top:0.9rem">
+            <button id="spinBtn" class="btn">Spin</button>
+            <button id="resetBtn" class="btn">Reset</button>
+          </div>
+
+          <div class="result" id="winner">Winner: —</div>
+          <div class="small" style="text-align:center;margin-top:0.6rem">Tip: use at least 3 items for best effect.</div>
+        </div>
+
+        <div class="card">
+          <label class="small">Examples</label>
+          <div class="small">Study groups, Prize draw, Choose a task, Food choice, Games</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:0.6rem">
+          <canvas id="wheel" width="520" height="520" aria-label="Lucky wheel"></canvas>
+          <div style="width:100%;display:flex;justify-content:center;gap:10px;align-items:center">
+            <div style="width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:20px solid #ff4d4d;transform:translateY(-8px)"></div>
+          </div>
+          <div class="small" style="margin-top:0.6rem;text-align:center">The arrow above points to the selected item after spin.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Cached DOM
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const itemsInput = document.getElementById('items');
+  const spinBtn = document.getElementById('spinBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const winnerEl = document.getElementById('winner');
+  const durationInput = document.getElementById('duration');
+
+  let items = ["Apple","Banana","Orange","Prize"];
+  let colors = [];
+  let startAngle = 0;
+  let spinAngle = 0;
+  let isSpinning = false;
+
+  function generateColors(n){
+    const palette = ["#ff7f50","#00bfff","#32cd32","#ffa500","#adff2f","#ff69b4","#9370db","#7fffd4","#ffd700","#87cefa"];
+    let out=[];
+    for(let i=0;i<n;i++) out.push(palette[i%palette.length]);
+    return out;
+  }
+
+  function drawWheel(){
+    const cx = canvas.width/2, cy = canvas.height/2, radius = Math.min(cx,cy)-10;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const slice = 2*Math.PI / items.length;
+
+    // Draw slices
+    for(let i=0;i<items.length;i++){
+      const angle = startAngle + i*slice;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,radius,angle,angle+slice);
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      // text
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(angle + slice/2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#111";
+      ctx.font = "bold 16px Arial";
+      // fit text
+      const text = items[i];
+      // draw text along radial
+      ctx.fillText(text, radius - 14, 6);
+      ctx.restore();
+    }
+
+    // center circle
+    ctx.beginPath();
+    ctx.arc(cx,cy,40,0,2*Math.PI);
+    ctx.fillStyle="#111";
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function updateFromInput(){
+    const raw = itemsInput.value.trim();
+    if(raw){
+      const arr = raw.split(',').map(s => s.trim()).filter(s=>s);
+      if(arr.length>=1) items = arr;
+    } else {
+      items = ["Apple","Banana","Orange","Prize"];
+    }
+    colors = generateColors(items.length);
+    drawWheel();
+  }
+
+  // spin logic
+  function spinOnce(){
+    if(isSpinning) return;
+    updateFromInput();
+    if(items.length < 2){
+      alert('Add at least 2 items.');
+      return;
+    }
+    isSpinning = true;
+    winnerEl.textContent = "Spinning...";
+    const duration = Math.max(2, Math.min(20, parseFloat(durationInput.value) || 5));
+    // choose random target slice index
+    const randIndex = Math.floor(Math.random() * items.length);
+    // compute target angle so that arrow (at top) points to center of that slice
+    const slice = 360 / items.length;
+    // We want final rotation to align such that selected slice center is at -90deg (top)
+    const targetAngle = 360* (3 + Math.random()*3) + (randIndex * slice) + slice/2; // add multiple full rotations for effect
+    // convert to radians and compute spin velocity style
+    const start = performance.now();
+    const startAngleDeg = (startAngle * 180/Math.PI) % 360;
+    const initial = startAngleDeg;
+    const end = startAngleDeg + targetAngle;
+    const animate = (now)=>{
+      const t = Math.min(1, (now - start) / (duration * 1000));
+      // ease out cubic
+      const ease = 1 - Math.pow(1 - t, 3);
+      const currentDeg = initial + (end - initial) * ease;
+      startAngle = (currentDeg * Math.PI/180) % (2*Math.PI);
+      drawWheel();
+      if(t < 1){
+        requestAnimationFrame(animate);
+      } else {
+        // determine winner index by angle
+        // angle pointing to top is -90deg -> convert startAngle to degrees
+        const finalDeg = (startAngle * 180/Math.PI) % 360;
+        // compute which slice at top: top angle = 270 deg in wheel coords. We used center text positioning; compute index:
+        const offsetDeg = (270 - finalDeg + 360) % 360;
+        const chosen = Math.floor(offsetDeg / slice) % items.length;
+        winnerEl.textContent = "Winner: " + items[chosen];
+        isSpinning = false;
+      }
+    };
+    requestAnimationFrame(animate);
+  }
+
+  // Reset wheel display and inputs
+  function resetWheel(){
+    itemsInput.value = items.join(', ');
+    updateFromInput();
+    winnerEl.textContent = "Winner: —";
+  }
+
+  // events
+  spinBtn.addEventListener('click', spinOnce);
+  resetBtn.addEventListener('click', resetWheel);
+  itemsInput.addEventListener('input', ()=>{ updateFromInput(); });
+
+  // init
+  itemsInput.value = items.join(', ');
+  updateFromInput();
+  // make canvas responsive
+  function resizeCanvas(){
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.min(520, Math.floor(rect.width)) * dpr;
+    canvas.height = Math.min(520, Math.floor(rect.width)) * dpr; // square
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    drawWheel();
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+</script>
+</body>
+</html>
