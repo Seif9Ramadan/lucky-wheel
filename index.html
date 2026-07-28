@@ -2,168 +2,372 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="A professional Lucky Wheel application for giveaways, classrooms, games and random selection.">
+
+    <meta name="author"
+          content="Seif Basha">
 
     <title>Lucky Wheel</title>
 
-    <meta name="description"
-        content="A modern customizable Lucky Wheel application for raffles, giveaways, classrooms, games, and decision making.">
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-    <meta name="keywords"
-        content="Lucky Wheel, Wheel Spinner, Random Picker, Giveaway, Decision Maker">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-    <meta name="author" content="Seif Basha">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
-    <link rel="icon" href="assets/icons/favicon.png">
+    <link rel="stylesheet"
+          href="style.css">
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <main class="container">
+<header class="header">
 
-        <header>
+    <h1>🎡 Lucky Wheel</h1>
 
-            <h1>🎡 Lucky Wheel</h1>
+    <p>
+        Professional random picker for games, classrooms, raffles and giveaways.
+    </p>
 
-            <p class="subtitle">
-                Randomly choose names, prizes, tasks, teams, or anything you like.
-            </p>
+</header>
 
-        </header>
+<main class="dashboard">
 
-        <section class="content">
+    <!-- ========================================= -->
+    <!-- Sidebar -->
+    <!-- ========================================= -->
 
-            <!-- Left Panel -->
+    <aside class="sidebar">
 
-            <section class="panel">
+        <!-- Entries -->
 
-                <div class="card">
+        <section class="card">
 
-                    <label for="items">
-                        Enter Items
-                    </label>
+            <h2>📝 Entries</h2>
 
-                    <textarea
-                        id="items"
-                        rows="8"
-                        placeholder="One item per line
+            <textarea id="items"
+                      placeholder="One item per line...
 
 Apple
 Banana
 Orange
-Prize">
-                    </textarea>
+Prize"></textarea>
 
-                </div>
+            <div class="button-grid">
 
-                <div class="card">
+                <button id="shuffleBtn">
+                    🔀 Shuffle
+                </button>
 
-                    <label for="duration">
-                        Spin Duration (Seconds)
-                    </label>
+                <button id="clearBtn">
+                    🗑 Clear
+                </button>
 
-                    <input
-                        type="number"
-                        id="duration"
-                        min="2"
-                        max="20"
-                        value="5">
+                <button id="importBtn">
+                    📂 Import
+                </button>
 
-                </div>
+                <button id="exportBtn">
+                    💾 Export
+                </button>
 
-                <div class="button-group">
-
-                    <button id="spinBtn" class="primary">
-
-                        🎲 Spin
-
-                    </button>
-
-                    <button id="resetBtn">
-
-                        🔄 Reset
-
-                    </button>
-
-                </div>
-
-                <div class="result-card">
-
-                    <h2>Winner</h2>
-
-                    <p id="winner">
-                        —
-                    </p>
-
-                </div>
-
-                <div class="tips">
-
-                    <h3>Ideas</h3>
-
-                    <ul>
-
-                        <li>🎁 Giveaways</li>
-
-                        <li>📚 Study Groups</li>
-
-                        <li>🎮 Games</li>
-
-                        <li>🍕 Food Choice</li>
-
-                        <li>✅ Daily Tasks</li>
-
-                    </ul>
-
-                </div>
-
-            </section>
-
-            <!-- Right Panel -->
-
-            <section class="panel">
-
-                <div class="wheel-card">
-
-                    <canvas
-                        id="wheel"
-                        width="600"
-                        height="600">
-
-                    </canvas>
-
-                    <div class="pointer">
-
-                    </div>
-
-                </div>
-
-            </section>
+            </div>
 
         </section>
 
-    </main>
+        <!-- Controls -->
 
-    <footer>
+        <section class="card">
 
-        Built with ❤️ by
-        <strong>Seif Basha</strong>
+            <h2>⚙ Settings</h2>
 
-    </footer>
+            <label>
 
-    <script src="script.js"></script>
+                Spin Duration
+
+                <input type="number"
+                       id="duration"
+                       value="5"
+                       min="2"
+                       max="20">
+
+            </label>
+
+            <label class="switch">
+
+                <input type="checkbox"
+                       id="removeWinner">
+
+                Remove Winner
+
+            </label>
+
+            <label class="switch">
+
+                <input type="checkbox"
+                       id="enableSound"
+                       checked>
+
+                Sound
+
+            </label>
+
+            <label class="switch">
+
+                <input type="checkbox"
+                       id="enableConfetti"
+                       checked>
+
+                Confetti
+
+            </label>
+
+            <label>
+
+                Theme
+
+                <select id="theme">
+
+                    <option>Dark</option>
+
+                    <option>Light</option>
+
+                    <option>Ocean</option>
+
+                    <option>Forest</option>
+
+                </select>
+
+            </label>
+
+        </section>
+
+        <!-- Buttons -->
+
+        <section class="card">
+
+            <div class="button-column">
+
+                <button id="spinBtn"
+                        class="primary">
+
+                    🎲 Spin Wheel
+
+                </button>
+
+                <button id="resetBtn">
+
+                    🔄 Reset
+
+                </button>
+
+                <button id="copyWinnerBtn">
+
+                    📋 Copy Winner
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- Winner -->
+
+        <section class="card winner-card">
+
+            <h2>🏆 Winner</h2>
+
+            <h1 id="winner">
+
+                —
+
+            </h1>
+
+        </section>
+
+    </aside>
+
+    <!-- ========================================= -->
+    <!-- Main Wheel -->
+    <!-- ========================================= -->
+
+    <section class="wheel-section">
+
+        <div class="wheel-card">
+
+            <canvas id="wheel"
+                    width="700"
+                    height="700">
+
+            </canvas>
+
+            <div class="pointer">
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ========================================= -->
+    <!-- Right Panel -->
+    <!-- ========================================= -->
+
+    <aside class="right-panel">
+
+        <!-- History -->
+
+        <section class="card">
+
+            <h2>📜 History</h2>
+
+            <ul id="historyList">
+
+            </ul>
+
+        </section>
+
+        <!-- Statistics -->
+
+        <section class="card">
+
+            <h2>📊 Statistics</h2>
+
+            <div class="stat">
+
+                <span>Total Spins</span>
+
+                <strong id="totalSpins">
+
+                    0
+
+                </strong>
+
+            </div>
+
+            <div class="stat">
+
+                <span>Unique Winners</span>
+
+                <strong id="uniqueWinners">
+
+                    0
+
+                </strong>
+
+            </div>
+
+            <div class="stat">
+
+                <span>Remaining Entries</span>
+
+                <strong id="remainingEntries">
+
+                    0
+
+                </strong>
+
+            </div>
+
+        </section>
+
+        <!-- Presets -->
+
+        <section class="card">
+
+            <h2>💾 Presets</h2>
+
+            <select id="presetList">
+
+                <option>Select Preset</option>
+
+            </select>
+
+            <div class="button-column">
+
+                <button id="savePreset">
+
+                    Save
+
+                </button>
+
+                <button id="loadPreset">
+
+                    Load
+
+                </button>
+
+                <button id="deletePreset">
+
+                    Delete
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- About -->
+
+        <section class="card">
+
+            <h2>ℹ About</h2>
+
+            <p>
+
+                Lucky Wheel
+
+                <br>
+
+                Version 2.0
+
+            </p>
+
+            <p>
+
+                Made with ❤️ by
+
+                <strong>
+
+                    Seif Basha
+
+                </strong>
+
+            </p>
+
+            <a href="https://github.com/Seif9Ramadan"
+               target="_blank">
+
+                GitHub Repository
+
+            </a>
+
+        </section>
+
+    </aside>
+
+</main>
+
+<footer>
+
+    © 2026 Seif Basha • Open Source • MIT License
+
+</footer>
+
+<script src="script.js"></script>
 
 </body>
 
 </html>
-
