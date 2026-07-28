@@ -1,530 +1,1004 @@
-"use strict";
+/* ===========================================================
+   Lucky Wheel
+   Author : Seif Basha
+   Version: 2.0
+=========================================================== */
 
-/*==================================================
-    LUCKY WHEEL
-    Author : Seif Basha
-    Version: 2.0
-==================================================*/
+/* ===========================================================
+   Google Font
+=========================================================== */
 
-
-/*==================================================
-    DOM ELEMENTS
-==================================================*/
-
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-
-const itemsInput = document.getElementById("items");
-const durationInput = document.getElementById("duration");
-
-const spinButton = document.getElementById("spinBtn");
-const resetButton = document.getElementById("resetBtn");
-
-const winnerLabel = document.getElementById("winner");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 
-/*==================================================
-    CONSTANTS
-==================================================*/
+/* ===========================================================
+   CSS Variables
+=========================================================== */
 
-const DEFAULT_ITEMS = [
-    "Apple",
-    "Banana",
-    "Orange",
-    "Prize"
-];
+:root{
 
-const COLOR_PALETTE = [
+    --background:#0f172a;
+    --background-secondary:#1e293b;
 
-    "#FF6B6B",
-    "#4D96FF",
-    "#6BCB77",
-    "#FFD93D",
-    "#845EC2",
-    "#FF9671",
-    "#00C9A7",
-    "#F9F871",
-    "#0081CF",
-    "#C34A36"
+    --card:#1e293bcc;
 
-];
+    --border:rgba(255,255,255,.08);
 
-const MIN_DURATION = 2;
-const MAX_DURATION = 20;
+    --primary:#3b82f6;
+    --primary-hover:#2563eb;
 
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
 
-/*==================================================
-    GLOBAL VARIABLES
-==================================================*/
+    --text:#f8fafc;
+    --text-secondary:#cbd5e1;
+    --text-muted:#94a3b8;
 
-let wheelItems = [...DEFAULT_ITEMS];
+    --input-bg:#111827;
 
-let wheelColors = [];
+    --shadow:
+        0 12px 30px rgba(0,0,0,.35);
 
-let currentRotation = 0;
+    --radius:18px;
 
-let spinning = false;
-/*==================================================
-    UTILITY FUNCTIONS
-==================================================*/
-
-/*
-    Clamp a value between a minimum and maximum.
-*/
-function clamp(value, min, max)
-{
-    return Math.max(min, Math.min(max, value));
-}
-
-/*
-    Generate a random integer.
-*/
-function randomInt(min, max)
-{
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/*
-    Convert degrees to radians.
-*/
-function degreesToRadians(degrees)
-{
-    return degrees * Math.PI / 180;
-}
-
-/*
-    Convert radians to degrees.
-*/
-function radiansToDegrees(radians)
-{
-    return radians * 180 / Math.PI;
-}
-
-/*
-    Generate colours for each wheel slice.
-*/
-function generateColors(count)
-{
-    const colors = [];
-
-    for(let i = 0; i < count; i++)
-    {
-        colors.push(
-            COLOR_PALETTE[i % COLOR_PALETTE.length]
-        );
-    }
-
-    return colors;
-}
-/*==================================================
-    INPUT FUNCTIONS
-==================================================*/
-
-function updateWheelItems()
-{
-
-    const text = itemsInput.value.trim();
-
-    if(text === "")
-    {
-        wheelItems = [...DEFAULT_ITEMS];
-    }
-    else
-    {
-        wheelItems = text
-            .split(",")
-            .map(item => item.trim())
-            .filter(item => item !== "");
-    }
-
-    wheelColors = generateColors(
-        wheelItems.length
-    );
-
-    drawWheel();
+    --transition:.25s ease;
 
 }
 
-function getSpinDuration()
-{
-    return clamp(
 
-        Number(durationInput.value) || 5,
+/* ===========================================================
+   Themes
+=========================================================== */
 
-        MIN_DURATION,
+body[data-theme="light"]{
 
-        MAX_DURATION
+    --background:#eef2f7;
+    --background-secondary:#dde6f0;
 
-    );
+    --card:#ffffffcc;
+
+    --border:rgba(15,23,42,.08);
+
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+
+    --text:#0f172a;
+    --text-secondary:#334155;
+    --text-muted:#64748b;
+
+    --input-bg:#f1f5f9;
+
+    --shadow:
+        0 12px 30px rgba(15,23,42,.12);
+
 }
-/*==================================================
-    DRAWING FUNCTIONS
-==================================================*/
 
-function drawWheel()
-{
+body[data-theme="ocean"]{
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    --background:#04202c;
+    --background-secondary:#0a3d4d;
 
-    const radius =
-        Math.min(centerX, centerY) - 10;
+    --card:#0e3b4ecc;
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    --border:rgba(255,255,255,.08);
 
-    const slice =
-        (2 * Math.PI) / wheelItems.length;
+    --primary:#06b6d4;
+    --primary-hover:#0891b2;
 
-    for(let i = 0; i < wheelItems.length; i++)
-    {
+    --success:#2dd4bf;
 
-        const angle =
-            currentRotation +
-            (i * slice);
+    --text:#e6fbff;
+    --text-secondary:#a5e6f0;
+    --text-muted:#7cc4d1;
 
-        ctx.beginPath();
+    --input-bg:#0a2f3b;
 
-        ctx.moveTo(centerX, centerY);
+    --shadow:
+        0 12px 30px rgba(0,0,0,.4);
 
-        ctx.arc(
-            centerX,
-            centerY,
-            radius,
-            angle,
-            angle + slice
+}
+
+body[data-theme="forest"]{
+
+    --background:#0f1f14;
+    --background-secondary:#1a3324;
+
+    --card:#1c3627cc;
+
+    --border:rgba(255,255,255,.08);
+
+    --primary:#22c55e;
+    --primary-hover:#16a34a;
+
+    --warning:#eab308;
+
+    --text:#f0fdf4;
+    --text-secondary:#bbf7d0;
+    --text-muted:#86e0a4;
+
+    --input-bg:#12261a;
+
+    --shadow:
+        0 12px 30px rgba(0,0,0,.4);
+
+}
+
+
+/* ===========================================================
+   Reset
+=========================================================== */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    min-height:100vh;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--background),
+            var(--background-secondary)
         );
 
-        ctx.closePath();
+    color:var(--text);
 
-        ctx.fillStyle = wheelColors[i];
+    font-family:"Inter",sans-serif;
 
-        ctx.fill();
-
-        ctx.save();
-
-        ctx.translate(centerX, centerY);
-
-        ctx.rotate(angle + slice / 2);
-
-        ctx.textAlign = "right";
-
-        ctx.fillStyle = "#222";
-
-        ctx.font = "bold 18px Arial";
-
-        ctx.fillText(
-            wheelItems[i],
-            radius - 20,
-            6
-        );
-
-        ctx.restore();
-
-    }
-
-    ctx.beginPath();
-
-    ctx.arc(
-        centerX,
-        centerY,
-        40,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle = "#181818";
-
-    ctx.fill();
+    transition:background .3s ease,color .3s ease;
 
 }
-/*==================================================
-    SPIN FUNCTIONS
-==================================================*/
 
 
-/*
-    Start spinning the wheel.
-*/
+/* ===========================================================
+   Typography
+=========================================================== */
 
-function spinWheel()
-{
+h1{
 
-    if (spinning)
-    {
-        return;
-    }
+    font-size:2.7rem;
 
-    updateWheelItems();
-
-    if (wheelItems.length < 2)
-    {
-        alert("Please enter at least two items.");
-        return;
-    }
-
-    spinning = true;
-
-    winnerLabel.textContent = "Spinning...";
-
-    winnerLabel.classList.remove("winner");
-
-
-    const duration = getSpinDuration();
-
-    const sliceAngle = 360 / wheelItems.length;
-
-    // Choose a random winner
-
-    const winningIndex = randomInt(
-        0,
-        wheelItems.length - 1
-    );
-
-    /*
-        Calculate the angle needed so the
-        selected slice lands under the arrow.
-    */
-
-    const fullRotations = randomInt(5, 8) * 360;
-
-    const targetAngle =
-        fullRotations +
-        (winningIndex * sliceAngle) +
-        (sliceAngle / 2);
-
-    animateSpin(
-
-        duration,
-
-        targetAngle,
-
-        winningIndex
-
-    );
-
-}
-/*==================================================
-    CANVAS
-==================================================*/
-
-function resizeCanvas()
-{
-    const size = Math.min(520, window.innerWidth * 0.9);
-
-    const dpr = window.devicePixelRatio || 1;
-
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
-
-    drawWheel();
-}
-/*==================================================
-    EVENT LISTENERS
-==================================================*/
-
-// Spin Button
-
-spinButton.addEventListener(
-    "click",
-    spinWheel
-);
-
-
-// Reset Button
-
-resetButton.addEventListener(
-    "click",
-    resetWheel
-);
-
-
-// Update wheel when text changes
-
-itemsInput.addEventListener(
-    "input",
-    updateWheelItems
-);
-
-
-// Window Resize
-
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
-/*==================================================
-    KEYBOARD SHORTCUTS
-==================================================*/
-
-document.addEventListener("keydown", (event) =>
-{
-
-    // Ignore shortcuts while typing
-
-    if (
-        event.target.tagName === "TEXTAREA" ||
-        event.target.tagName === "INPUT"
-    )
-    {
-        return;
-    }
-
-    switch(event.key)
-    {
-
-        case "Enter":
-
-            spinWheel();
-
-            break;
-
-        case "r":
-
-        case "R":
-
-            resetWheel();
-
-            break;
-
-    }
-
-});
-/*==================================================
-    STARTUP
-==================================================*/
-
-function initialize()
-{
-
-    wheelColors =
-        generateColors(
-            wheelItems.length
-        );
-
-    itemsInput.value =
-        wheelItems.join(", ");
-
-    resizeCanvas();
-
-    winnerLabel.textContent =
-        "Winner: —";
+    font-weight:800;
 
 }
 
-initialize();
-/*==================================================
-    ANIMATION
-==================================================*/
+h2{
 
-function animateSpin(
-    duration,
-    targetAngle,
-    winningIndex
-)
-{
+    font-size:1.2rem;
 
-    const startTime = performance.now();
+    margin-bottom:18px;
 
-    const startDegrees =
-        radiansToDegrees(currentRotation);
+}
 
-    const endDegrees =
-        startDegrees + targetAngle;
+h3{
 
-    function frame(time)
-    {
+    font-size:1rem;
 
-        const elapsed =
-            (time - startTime) / 1000;
+}
 
-        const progress =
-            Math.min(
-                elapsed / duration,
-                1
-            );
+p{
 
-        const ease =
-            1 - Math.pow(1 - progress, 3);
+    color:var(--text-secondary);
 
-        const currentDegrees =
-            startDegrees +
-            ((endDegrees - startDegrees) * ease);
+    line-height:1.7;
 
-        currentRotation =
-            degreesToRadians(currentDegrees);
+}
 
-        drawWheel();
+a{
 
-        if(progress < 1)
-        {
-            requestAnimationFrame(frame);
-        }
-        else
-        {
-            finishSpin(winningIndex);
-        }
+    color:var(--primary);
+
+    text-decoration:none;
+
+}
+
+a:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* ===========================================================
+   Header
+=========================================================== */
+
+.header{
+
+    width:95%;
+
+    max-width:1700px;
+
+    margin:auto;
+
+    padding:45px 0 20px;
+
+    text-align:center;
+
+}
+
+.header h1{
+
+    margin-bottom:12px;
+
+}
+
+.header p{
+
+    font-size:1.05rem;
+
+}
+
+
+/* ===========================================================
+   Dashboard
+=========================================================== */
+
+.dashboard{
+
+    width:95%;
+
+    max-width:1700px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+
+        360px
+
+        1fr
+
+        330px;
+
+    gap:30px;
+
+    padding-bottom:40px;
+
+}
+
+
+/* ===========================================================
+   Sidebar
+=========================================================== */
+
+.sidebar{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+}
+
+.right-panel{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+}
+
+
+/* ===========================================================
+   Cards
+=========================================================== */
+
+.card{
+
+    background:var(--card);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius);
+
+    padding:24px;
+
+    box-shadow:var(--shadow);
+
+    transition:var(--transition);
+
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:
+
+        rgba(59,130,246,.35);
+
+}
+
+
+/* ===========================================================
+   Wheel Area
+=========================================================== */
+
+.wheel-section{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.wheel-card{
+
+    position:relative;
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:var(--card);
+
+    border-radius:25px;
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+    padding:35px;
+
+}
+
+
+/* ===========================================================
+   Inputs
+=========================================================== */
+
+textarea,
+input,
+select{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    margin-top:10px;
+
+    margin-bottom:18px;
+
+    border-radius:12px;
+
+    border:1px solid transparent;
+
+    background:var(--input-bg);
+
+    color:var(--text);
+
+    font-size:15px;
+
+    outline:none;
+
+    transition:var(--transition);
+
+}
+
+
+textarea{
+
+    resize:vertical;
+
+    min-height:220px;
+
+}
+
+
+textarea:focus,
+input:focus,
+select:focus{
+
+    border-color:var(--primary);
+
+}
+
+
+/* ===========================================================
+   Labels
+=========================================================== */
+
+label{
+
+    display:block;
+
+    font-weight:600;
+
+    margin-top:8px;
+
+}
+
+
+/* ===========================================================
+   Buttons
+=========================================================== */
+
+button{
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:12px;
+
+    padding:14px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+}
+
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+
+button:active{
+
+    transform:scale(.97);
+
+}
+
+button:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+
+/* ===========================================================
+   Primary Button
+=========================================================== */
+
+.primary{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+
+.primary:hover{
+
+    background:var(--primary-hover);
+
+}
+
+
+/* ===========================================================
+   Normal Buttons
+=========================================================== */
+
+button:not(.primary){
+
+    background:#334155;
+
+    color:white;
+
+}
+
+
+button:not(.primary):hover{
+
+    background:#475569;
+
+}
+
+
+/* ===========================================================
+   Button Grid
+=========================================================== */
+
+.button-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(2,1fr);
+
+    gap:12px;
+
+    margin-top:10px;
+
+}
+
+
+.button-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+}
+
+
+/* ===========================================================
+   Winner Card
+=========================================================== */
+
+.winner-card{
+
+    text-align:center;
+
+}
+
+
+#winner{
+
+    margin-top:15px;
+
+    font-size:2.6rem;
+
+    color:var(--success);
+
+    font-weight:800;
+
+    word-break:break-word;
+
+}
+
+
+/* ===========================================================
+   Statistics
+=========================================================== */
+
+.stat{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px 0;
+
+    border-bottom:
+
+        1px solid rgba(255,255,255,.08);
+
+}
+
+
+.stat:last-child{
+
+    border-bottom:none;
+
+}
+
+
+.stat strong{
+
+    color:var(--primary);
+
+    font-size:1.1rem;
+
+}
+
+
+/* ===========================================================
+   History
+=========================================================== */
+
+#historyList{
+
+    list-style:none;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    max-height:260px;
+
+    overflow-y:auto;
+
+}
+
+
+#historyList li{
+
+    padding:10px;
+
+    border-radius:10px;
+
+    background:var(--input-bg);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    font-size:.9rem;
+
+}
+
+#historyList li span.time{
+
+    color:var(--text-muted);
+
+    white-space:nowrap;
+
+}
+
+#historyList .empty{
+
+    color:var(--text-muted);
+
+    text-align:center;
+
+    background:transparent;
+
+}
+
+
+/* ===========================================================
+   Switches
+=========================================================== */
+
+.switch{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:12px;
+
+}
+
+
+.switch input{
+
+    width:20px;
+
+    height:20px;
+
+    margin:0;
+
+}
+
+
+/* ===========================================================
+   Footer
+=========================================================== */
+
+footer{
+
+    padding:35px;
+
+    text-align:center;
+
+    color:var(--text-secondary);
+
+}
+
+
+/* ===========================================================
+   Responsive
+=========================================================== */
+
+@media(max-width:1400px){
+
+    .dashboard{
+
+        grid-template-columns:
+
+            320px
+
+            1fr;
 
     }
 
-    requestAnimationFrame(frame);
+    .right-panel{
+
+        grid-column:span 2;
+
+        display:grid;
+
+        grid-template-columns:
+
+            repeat(auto-fit,minmax(280px,1fr));
+
+    }
 
 }
-/*==================================================
-    FINISH SPIN
-==================================================*/
 
-function finishSpin(index)
-{
 
-    spinning = false;
+@media(max-width:900px){
 
-    winnerLabel.textContent =
-        `Winner: ${wheelItems[index]}`;
+    .dashboard{
 
-    winnerLabel.classList.add("winner");
+        grid-template-columns:1fr;
+
+    }
+
+    .right-panel{
+
+        grid-column:auto;
+
+        display:flex;
+
+    }
 
 }
-/*==================================================
-    RESET
-==================================================*/
 
-function resetWheel()
-{
 
-    wheelItems = [...DEFAULT_ITEMS];
+@media(max-width:600px){
 
-    itemsInput.value =
-        wheelItems.join(", ");
+    h1{
 
-    currentRotation = 0;
+        font-size:2rem;
 
-    winnerLabel.textContent =
-        "Winner: —";
+    }
 
-    winnerLabel.classList.remove("winner");
+    .button-grid{
 
-    wheelColors =
-        generateColors(
-            wheelItems.length
-        );
+        grid-template-columns:1fr;
 
-    drawWheel();
+    }
+
+}
+/* ===========================
+   WHEEL SECTION
+=========================== */
+
+.wheel-wrapper{
+    position:relative;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+canvas{
+    width:100%;
+    max-width:520px;
+    height:auto;
+}
+
+/* Arrow */
+
+.pointer{
+    position:absolute;
+    top:-8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+
+    border-left:15px solid transparent;
+    border-right:15px solid transparent;
+    border-top:30px solid var(--danger);
+
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.5));
+}
+
+.wheel-description{
+    margin-top:15px;
+    text-align:center;
+}
+
+/* ===========================
+   RESULT
+=========================== */
+
+.result{
+    margin-top:20px;
+    padding:15px;
+
+    text-align:center;
+    font-size:1.15rem;
+    font-weight:bold;
+
+    background:rgba(255,255,255,.03);
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.06);
+
+    transition:.3s;
+}
+
+.result.winner{
+    color:var(--success);
+    animation:pulse .8s;
+}
+
+/* ===========================
+   ANIMATIONS
+=========================== */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.06);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.card{
+    animation:fadeIn .4s ease;
+}
+
+/* Confetti */
+
+.confetti-piece{
+    position:fixed;
+    top:-10px;
+    width:8px;
+    height:14px;
+    opacity:.9;
+    pointer-events:none;
+    z-index:9999;
+    animation:confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall{
+
+    to{
+        transform:
+            translateY(105vh)
+            rotate(720deg);
+        opacity:0;
+    }
+
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb{
+    background:#555;
+    border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:#777;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width:900px){
+
+    .cols{
+        flex-direction:column;
+    }
+
+    canvas{
+        max-width:450px;
+    }
+
+}
+
+@media (max-width:600px){
+
+    body{
+        padding:15px;
+    }
+
+    .container{
+        padding:20px;
+    }
+
+    h1{
+        font-size:2rem;
+    }
+
+    textarea{
+        min-height:140px;
+    }
+
+    .row{
+        flex-direction:column;
+    }
+
+    button{
+        width:100%;
+    }
+
+    canvas{
+        max-width:320px;
+    }
+
+}
+
+/* ===========================
+   ACCESSIBILITY
+=========================== */
+
+button:focus,
+textarea:focus,
+input:focus{
+
+    outline:3px solid rgba(0,191,255,.45);
+
+}
+
+::selection{
+
+    background:#00bfff;
+    color:white;
 
 }
