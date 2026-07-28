@@ -85,6 +85,12 @@ Prize"></textarea>
 
             </div>
 
+            <!-- Hidden file input used by the Import button -->
+            <input type="file"
+                   id="importFile"
+                   accept=".txt,.csv,.json"
+                   style="display:none">
+
         </section>
 
         <!-- Controls -->
@@ -140,13 +146,13 @@ Prize"></textarea>
 
                 <select id="theme">
 
-                    <option>Dark</option>
+                    <option value="dark">Dark</option>
 
-                    <option>Light</option>
+                    <option value="light">Light</option>
 
-                    <option>Ocean</option>
+                    <option value="ocean">Ocean</option>
 
-                    <option>Forest</option>
+                    <option value="forest">Forest</option>
 
                 </select>
 
@@ -207,13 +213,17 @@ Prize"></textarea>
 
         <div class="wheel-card">
 
-            <canvas id="wheel"
-                    width="700"
-                    height="700">
+            <div class="wheel-wrapper">
 
-            </canvas>
+                <canvas id="wheel"
+                        width="700"
+                        height="700">
 
-            <div class="pointer">
+                </canvas>
+
+                <div class="pointer">
+
+                </div>
 
             </div>
 
@@ -291,7 +301,7 @@ Prize"></textarea>
 
             <select id="presetList">
 
-                <option>Select Preset</option>
+                <option value="">Select Preset</option>
 
             </select>
 
