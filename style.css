@@ -33,6 +33,9 @@
 
     --text:#f8fafc;
     --text-secondary:#cbd5e1;
+    --text-muted:#94a3b8;
+
+    --input-bg:#111827;
 
     --shadow:
         0 12px 30px rgba(0,0,0,.35);
@@ -40,6 +43,84 @@
     --radius:18px;
 
     --transition:.25s ease;
+
+}
+
+
+/* ===========================================================
+   Themes
+=========================================================== */
+
+body[data-theme="light"]{
+
+    --background:#eef2f7;
+    --background-secondary:#dde6f0;
+
+    --card:#ffffffcc;
+
+    --border:rgba(15,23,42,.08);
+
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+
+    --text:#0f172a;
+    --text-secondary:#334155;
+    --text-muted:#64748b;
+
+    --input-bg:#f1f5f9;
+
+    --shadow:
+        0 12px 30px rgba(15,23,42,.12);
+
+}
+
+body[data-theme="ocean"]{
+
+    --background:#04202c;
+    --background-secondary:#0a3d4d;
+
+    --card:#0e3b4ecc;
+
+    --border:rgba(255,255,255,.08);
+
+    --primary:#06b6d4;
+    --primary-hover:#0891b2;
+
+    --success:#2dd4bf;
+
+    --text:#e6fbff;
+    --text-secondary:#a5e6f0;
+    --text-muted:#7cc4d1;
+
+    --input-bg:#0a2f3b;
+
+    --shadow:
+        0 12px 30px rgba(0,0,0,.4);
+
+}
+
+body[data-theme="forest"]{
+
+    --background:#0f1f14;
+    --background-secondary:#1a3324;
+
+    --card:#1c3627cc;
+
+    --border:rgba(255,255,255,.08);
+
+    --primary:#22c55e;
+    --primary-hover:#16a34a;
+
+    --warning:#eab308;
+
+    --text:#f0fdf4;
+    --text-secondary:#bbf7d0;
+    --text-muted:#86e0a4;
+
+    --input-bg:#12261a;
+
+    --shadow:
+        0 12px 30px rgba(0,0,0,.4);
 
 }
 
@@ -78,6 +159,8 @@ body{
     color:var(--text);
 
     font-family:"Inter",sans-serif;
+
+    transition:background .3s ease,color .3s ease;
 
 }
 
@@ -273,6 +356,8 @@ a:hover{
 
     display:flex;
 
+    flex-direction:column;
+
     justify-content:center;
 
     align-items:center;
@@ -312,9 +397,9 @@ select{
 
     border:1px solid transparent;
 
-    background:#111827;
+    background:var(--input-bg);
 
-    color:white;
+    color:var(--text);
 
     font-size:15px;
 
@@ -391,6 +476,16 @@ button:hover{
 button:active{
 
     transform:scale(.97);
+
+}
+
+button:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+    transform:none;
 
 }
 
@@ -486,6 +581,8 @@ button:not(.primary):hover{
 
     font-weight:800;
 
+    word-break:break-word;
+
 }
 
 
@@ -540,6 +637,10 @@ button:not(.primary):hover{
 
     gap:10px;
 
+    max-height:260px;
+
+    overflow-y:auto;
+
 }
 
 
@@ -549,7 +650,33 @@ button:not(.primary):hover{
 
     border-radius:10px;
 
-    background:#111827;
+    background:var(--input-bg);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    font-size:.9rem;
+
+}
+
+#historyList li span.time{
+
+    color:var(--text-muted);
+
+    white-space:nowrap;
+
+}
+
+#historyList .empty{
+
+    color:var(--text-muted);
+
+    text-align:center;
+
+    background:transparent;
 
 }
 
@@ -666,12 +793,6 @@ footer{
    WHEEL SECTION
 =========================== */
 
-.wheel-card{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
-
 .wheel-wrapper{
     position:relative;
     width:100%;
@@ -733,17 +854,6 @@ canvas{
 }
 
 /* ===========================
-   FOOTER
-=========================== */
-
-footer{
-    margin-top:30px;
-    text-align:center;
-    color:var(--text-muted);
-    font-size:.9rem;
-}
-
-/* ===========================
    ANIMATIONS
 =========================== */
 
@@ -781,6 +891,30 @@ footer{
     animation:fadeIn .4s ease;
 }
 
+/* Confetti */
+
+.confetti-piece{
+    position:fixed;
+    top:-10px;
+    width:8px;
+    height:14px;
+    opacity:.9;
+    pointer-events:none;
+    z-index:9999;
+    animation:confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall{
+
+    to{
+        transform:
+            translateY(105vh)
+            rotate(720deg);
+        opacity:0;
+    }
+
+}
+
 /* ===========================
    SCROLLBAR
 =========================== */
@@ -790,7 +924,7 @@ footer{
 }
 
 ::-webkit-scrollbar-track{
-    background:#1c1c1c;
+    background:var(--background-secondary);
 }
 
 ::-webkit-scrollbar-thumb{
